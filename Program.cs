@@ -25,7 +25,7 @@ namespace discord_project
                 .AddSingleton(_command)
                 .BuildServiceProvider();
 
-            string botPrefix = "ENTERYOUROWNTOKEN";
+            string botPrefix = "NjYxNTkxMjc2NDkxMTEyNDQ5.XhHExw.oOZUxEtY0ec9paGxPELgT7DtRjo";
 
             //event subscription
             _client.Log += Log;
