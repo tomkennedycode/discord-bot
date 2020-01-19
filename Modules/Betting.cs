@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Discord.Commands;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using discord_project.Models;
 
 namespace discord_project.Modules
 {
@@ -13,24 +15,30 @@ namespace discord_project.Modules
         [Command("odds")]
         public async Task OddsAsync()
         {
-            GetOdds();
+            List<APIData> data = Task.Run(() => GetOdds()).Result;
             //await ReplyAsync("Here are the following odds");
         }
 
-        private async void GetOdds()
+        private async Task<List<APIData>> GetOdds()
         {
             string apiKey = "";
             
             using var client = new HttpClient();
-
             var result = await client.GetAsync(apiKey);
 
-            var data = result.Content.ReadAsStringAsync().Result;
+            result.EnsureSuccessStatusCode();
 
-            dynamic dataObj = JsonConvert.DeserializeObject(data);
-        
-            var test = dataObj.sport_key;
-        
+            string responseBody = await result.Content.ReadAsStringAsync();
+            JObject data = JObject.Parse(responseBody);
+            var token = (JArray)data.SelectToken("data");
+            var list = new List<APIData>();
+
+            foreach (var item in token)
+            {
+                list.Add(item.ToObject<APIData>());
+            }
+
+            return list;
         }
     }
 }
