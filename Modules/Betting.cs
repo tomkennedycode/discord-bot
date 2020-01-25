@@ -4,6 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Net.Http;
+using System.Text;
 using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,6 +24,27 @@ namespace discord_project.Modules
             List<RequestedOdds> skyBetOdds = DisplayOdds(data, "Sky Bet");
 
             //await ReplyAsync(returnedString);
+        }
+
+        [Command("matches")]
+        public async Task GetMatchesAsync()
+        {
+            List<APIData> data = Task.Run(() => GetOdds()).Result;
+            List<RequestedOdds> matches = DisplayOdds(data, "Sky Bet");
+
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append("The next 10 upcoming premier league games are: :clap:");
+
+            var tenMatches = matches.Take(10);
+
+            foreach (var match in tenMatches)
+            {
+                builder.Append(Environment.NewLine);
+                builder.Append(match.HomeTeam + " vs " + match.AwayTeam + " @ " + match.MatchDate);
+            }
+
+            await ReplyAsync(builder.ToString());
         }
 
         private async Task<List<APIData>> GetOdds()
