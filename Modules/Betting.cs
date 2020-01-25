@@ -8,20 +8,21 @@ using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using discord_project.Models;
+using System.Linq;
+using Discord.WebSocket;
+using System.Reflection;
 
 namespace discord_project.Modules
 {
     public class Betting: ModuleBase<SocketCommandContext>
     {
-        [Command("odds")]
-        public async Task OddsAsync()
+        [Command("skyodds")]
+        public async Task SkyOddsAsync()
         {
             List<APIData> data = Task.Run(() => GetOdds()).Result;
+            List<RequestedOdds> skyBetOdds = DisplayOdds(data, "Sky Bet");
 
-            List<RequestedOdds> skyBetOdds = DisplayOdds(data);
-            var firstMatch = skyBetOdds[0];
-            string returnedString = "Here are the following odds for the next match: " + firstMatch.HomeTeam + " vs " + firstMatch.AwayTeam + ", and if you put £1 on the home team, you will get £" + firstMatch.HomeOdds + " back via " + firstMatch.BettingSite;
-            await ReplyAsync(returnedString);
+            //await ReplyAsync(returnedString);
         }
 
         private async Task<List<APIData>> GetOdds()
@@ -46,39 +47,59 @@ namespace discord_project.Modules
             return list;
         }
 
-        private List<RequestedOdds> DisplayOdds(List<APIData> data) {
+        private List<RequestedOdds> DisplayOdds(List<APIData> data, string BettingSite) {
+            
             var requested = new List<RequestedOdds>();
 
-            foreach (var obj in data)
-            {
-                var addToList = new RequestedOdds();
-                addToList.HomeTeam = obj.home_team;
-                string[] teams = new string[2]
+            try {
+
+                foreach (var obj in data)
                 {
-                    obj.teams[0],
-                    obj.teams[1]
-                };
+                    var addToList = new RequestedOdds();
+                    addToList.HomeTeam = obj.home_team;
+                    string[] teams = new string[2]
+                    {
+                        obj.teams[0],
+                        obj.teams[1]
+                    };
 
-                int homeTeamIndex = Array.IndexOf(teams, addToList.HomeTeam);
-                int awayTeamIndex = (homeTeamIndex == 1) ? 0: 1;
+                    int homeTeamIndex = Array.IndexOf(teams, addToList.HomeTeam);
+                    int awayTeamIndex = (homeTeamIndex == 1) ? 0: 1;
 
-                addToList.AwayTeam = teams[awayTeamIndex];
+                    addToList.AwayTeam = teams[awayTeamIndex];
+                    addToList.MatchDate = ConvertUnixTimeStamp(obj.commence_time);
 
-                foreach (var odds in obj.sites)
-                {
-                    if (odds.site_nice == "Sky Bet") {
-                        addToList.BettingSite = odds.site_nice;
-                        addToList.HomeOdds = odds.odds.h2h[homeTeamIndex];
-                        addToList.AwayOdds = odds.odds.h2h[awayTeamIndex];
-                        addToList.DrawOdds = odds.odds.h2h[2];
+                    foreach (var odds in obj.sites)
+                    {
+                        if (odds.site_nice == BettingSite) {
+                            addToList.BettingSite = odds.site_nice;
+                            addToList.HomeOdds = odds.odds.h2h[homeTeamIndex];
+                            addToList.AwayOdds = odds.odds.h2h[awayTeamIndex];
+                            addToList.DrawOdds = odds.odds.h2h[2];
+                        }
                     }
+
+                    requested.Add(addToList);
                 }
 
-                requested.Add(addToList);                
+                return requested;
+
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
 
+            return requested;            
+        }
 
-            return requested;
+        private string ConvertUnixTimeStamp(int time) 
+        {
+            DateTime convertUnixTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            convertUnixTime = convertUnixTime.AddSeconds(time).ToLocalTime();
+
+            var formattedTime = convertUnixTime.Date.ToString("dd/MM/yyy") + " " + convertUnixTime.TimeOfDay.ToString();
+            return formattedTime;
         }
     }
 }
