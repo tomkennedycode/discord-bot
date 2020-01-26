@@ -101,6 +101,10 @@ namespace discord_project.Modules
                         }
                     }
 
+                    addToList.HomeOddsFraction = ConvertDecimalToFractionOdds((float)addToList.HomeOdds);
+                    addToList.AwayOddsFraction = ConvertDecimalToFractionOdds((float)addToList.AwayOdds);
+                    addToList.DrawOddsFraction = ConvertDecimalToFractionOdds((float)addToList.DrawOdds);
+
                     requested.Add(addToList);
                 }
 
@@ -122,6 +126,24 @@ namespace discord_project.Modules
 
             var formattedTime = convertUnixTime.Date.ToString("dd/MM/yyy") + " " + convertUnixTime.TimeOfDay.ToString();
             return formattedTime;
+        }
+
+        private string ConvertDecimalToFractionOdds(float odds)
+        {
+            int n = 0;
+
+            while(true) {
+                n++;
+                if (odds * n == (int) (odds * n))
+                {
+                    break;
+                }
+            }
+
+            int num = (int)(odds * n) - n;
+            int denum = n;
+
+            return num + "/" + denum;
         }
     }
 }
