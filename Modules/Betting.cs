@@ -23,7 +23,31 @@ namespace discord_project.Modules
             List<APIData> data = Task.Run(() => GetOdds()).Result;
             List<RequestedOdds> skyBetOdds = DisplayOdds(data, "Sky Bet");
 
-            //await ReplyAsync(returnedString);
+            StringBuilder builder = new StringBuilder();
+
+            var tenMatches = skyBetOdds.Take(10);
+
+            builder.Append("Odds for skybet matches (some odds may be like 0.02 wrong): :goal:");
+
+            foreach(var match in tenMatches)
+            {
+                builder.Append(Environment.NewLine);
+                builder.Append(match.HomeTeam + ": " + match.HomeOddsFraction + " | ");
+                builder.Append(match.AwayTeam + ": " + match.AwayOddsFraction + " | ");
+                builder.Append("Draw: " + match.DrawOddsFraction);
+            }
+
+            await ReplyAsync(builder.ToString());
+        }
+
+        [Command("bestodds")]
+        public async Task BestOddsAsync() {
+            List<APIData> data = Task.Run(() => GetOdds()).Result;
+            List<RequestedOdds> bestOdds = DisplayOdds(data, "ALL");
+
+            Console.WriteLine("test");
+            //await ReplyAsync(builder.ToString());
+
         }
 
         [Command("matches")]
@@ -93,13 +117,27 @@ namespace discord_project.Modules
 
                     foreach (var odds in obj.sites)
                     {
-                        if (odds.site_nice == BettingSite) {
+                        List<AllOdds> allOdds = new List<AllOdds>();
+                        if (odds.site_nice == BettingSite)
+                        {
                             addToList.BettingSite = odds.site_nice;
                             addToList.HomeOdds = odds.odds.h2h[homeTeamIndex];
                             addToList.AwayOdds = odds.odds.h2h[awayTeamIndex];
                             addToList.DrawOdds = odds.odds.h2h[2];
+                        } else if (BettingSite == "ALL") 
+                        {
+                            var addToAllOdds = new AllOdds();
+                            addToAllOdds.BettingSite = odds.site_nice;
+                            addToAllOdds.HomeOdds = odds.odds.h2h[homeTeamIndex];
+                            addToAllOdds.AwayOdds = odds.odds.h2h[awayTeamIndex];
+                            addToAllOdds.DrawOdds = odds.odds.h2h[2];
+
+                            allOdds.Add(addToAllOdds);
                         }
+
+                        addToList.AllOdds = allOdds;
                     }
+
 
                     addToList.HomeOddsFraction = ConvertDecimalToFractionOdds((float)addToList.HomeOdds);
                     addToList.AwayOddsFraction = ConvertDecimalToFractionOdds((float)addToList.AwayOdds);

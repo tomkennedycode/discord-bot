@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace discord_project.Models
 {
@@ -13,6 +14,7 @@ namespace discord_project.Models
         public double DrawOdds { get; set; }
         public string HomeOddsFraction { get; set; }
         public string AwayOddsFraction { get; set; }
-        public string DrawOddsFraction { get; set;}
+        public string DrawOddsFraction { get; set; }
+        public List<AllOdds> AllOdds { get; set; }
     }
 }
