@@ -32,9 +32,9 @@ namespace discord_project.Modules
             foreach(var match in tenMatches)
             {
                 builder.Append(Environment.NewLine);
-                builder.Append(match.HomeTeam + ": " + match.HomeOddsFraction + " | ");
-                builder.Append(match.AwayTeam + ": " + match.AwayOddsFraction + " | ");
-                builder.Append("Draw: " + match.DrawOddsFraction);
+                builder.Append($"{match.HomeTeam}: {match.HomeOddsFraction} | ");
+                builder.Append($"{match.AwayTeam}: {match.AwayOddsFraction} | ");
+                builder.Append($"Draw: {match.DrawOddsFraction}");
             }
 
             await ReplyAsync(builder.ToString());
@@ -65,7 +65,7 @@ namespace discord_project.Modules
             foreach (var match in tenMatches)
             {
                 builder.Append(Environment.NewLine);
-                builder.Append(match.HomeTeam + " vs " + match.AwayTeam + " @ " + match.MatchDate);
+                builder.Append($"{match.HomeTeam} vs {match.AwayTeam}  @  {match.MatchDate}");
             }
 
             await ReplyAsync(builder.ToString());
@@ -168,20 +168,20 @@ namespace discord_project.Modules
 
         private string ConvertDecimalToFractionOdds(float odds)
         {
-            int n = 0;
+            int calc = 0;
 
             while(true) {
-                n++;
-                if (odds * n == (int) (odds * n))
+                calc++;
+                if (odds * calc == (int) (odds * calc))
                 {
                     break;
                 }
             }
 
-            int num = (int)(odds * n) - n;
-            int denum = n;
+            int topFraction = (int)(odds * calc) - calc;
+            int bottomFraction = calc;
 
-            return num + "/" + denum;
+            return $"{topFraction}/{bottomFraction}";
         }
     }
 }
