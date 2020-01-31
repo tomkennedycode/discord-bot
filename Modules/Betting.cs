@@ -4,14 +4,10 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Text;
 using Discord.Commands;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using discord_project.Models;
 using System.Linq;
-using Discord.WebSocket;
-using System.Reflection;
 
 namespace discord_project.Modules
 {
@@ -43,10 +39,29 @@ namespace discord_project.Modules
         [Command("bestodds")]
         public async Task BestOddsAsync() {
             List<APIData> data = Task.Run(() => GetOdds()).Result;
-            List<RequestedOdds> bestOdds = DisplayOdds(data, "ALL");
+            List<RequestedOdds> allOdds = DisplayOdds(data, "ALL");
 
-            Console.WriteLine("test");
-            //await ReplyAsync(builder.ToString());
+            List<MVPSite> bestOdds = FindBestOdds(allOdds);
+
+            foreach (var match in bestOdds) {
+                match.HomeOddsFraction = ConvertDecimalToFractionOdds((float)match.HomeOdds);
+                match.AwayOddsFraction = ConvertDecimalToFractionOdds((float)match.AwayOdds);
+                match.DrawOddsFraction = ConvertDecimalToFractionOdds((float)match.DrawOdds);
+            }
+
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append("Showing the sites who have the best odds: :moneybag:");
+            var tenMatches = bestOdds.Take(10);
+            foreach(var match in tenMatches)
+            {
+                builder.Append(Environment.NewLine);
+                builder.Append($"{match.HomeTeam}: {match.HomeOddsFraction} - **{match.BettingSiteHome}** | ");
+                builder.Append($"{match.AwayTeam}: {match.AwayOddsFraction} - **{match.BettingSiteAway}** | ");
+                builder.Append($"Draw: {match.DrawOddsFraction} - **{match.BettingSiteDraw}**");
+            }
+
+            await ReplyAsync(builder.ToString());
 
         }
 
@@ -115,9 +130,10 @@ namespace discord_project.Modules
                     addToList.AwayTeam = teams[awayTeamIndex];
                     addToList.MatchDate = ConvertUnixTimeStamp(obj.commence_time);
 
+                    List<AllOdds> allOdds = new List<AllOdds>();
+
                     foreach (var odds in obj.sites)
                     {
-                        List<AllOdds> allOdds = new List<AllOdds>();
                         if (odds.site_nice == BettingSite)
                         {
                             addToList.BettingSite = odds.site_nice;
@@ -155,6 +171,61 @@ namespace discord_project.Modules
             }
 
             return requested;            
+        }
+
+        private List<MVPSite> FindBestOdds(List<RequestedOdds> data)
+        {
+            List<MVPSite> list = new List<MVPSite>();
+            foreach (var games in data) 
+            {
+                MVPSite mvpSite = new MVPSite();
+
+                mvpSite.HomeTeam = games.HomeTeam;
+                mvpSite.AwayTeam = games.AwayTeam;
+
+                double homeOddsMaxNumber = 0;
+                string bestBettingSiteHome = String.Empty;
+
+                double awayOddsMaxNumber = 0;
+                string bestBettingSiteAway = String.Empty;
+
+                double drawOddsMaxNumber = 0;
+                string bestBettingSiteDraw = String.Empty;
+
+                foreach (var odds in games.AllOdds) 
+                {
+ 
+                    if (odds.HomeOdds > homeOddsMaxNumber)
+                    {
+                        homeOddsMaxNumber = odds.HomeOdds;
+                        bestBettingSiteHome = odds.BettingSite;
+                    }
+
+                    if (odds.AwayOdds > awayOddsMaxNumber)
+                    {
+                        awayOddsMaxNumber = odds.AwayOdds;
+                        bestBettingSiteAway = odds.BettingSite;
+                    }
+
+                    if (odds.DrawOdds > drawOddsMaxNumber)
+                    {
+                        drawOddsMaxNumber = odds.DrawOdds;
+                        bestBettingSiteDraw = odds.BettingSite;
+                    }
+                }
+                mvpSite.BettingSiteHome = bestBettingSiteHome;
+                mvpSite.HomeOdds = homeOddsMaxNumber;
+
+                mvpSite.BettingSiteAway = bestBettingSiteAway;
+                mvpSite.AwayOdds = awayOddsMaxNumber;
+
+                mvpSite.BettingSiteDraw = bestBettingSiteDraw;
+                mvpSite.DrawOdds = drawOddsMaxNumber;
+
+                list.Add(mvpSite);
+            }
+
+            return list;
         }
 
         private string ConvertUnixTimeStamp(int time) 
