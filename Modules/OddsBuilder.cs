@@ -6,53 +6,54 @@ using System.Threading.Tasks;
 using discord_project.Models;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace discord_project.Modules {
     public class OddsBuilder : ModuleBase<SocketCommandContext>
     {
-        public async Task<List<APIData>> GetOdds () {
+        public async Task<List<APIData>> GetOdds()
+        {
             string apiKey = "";
 
-            using var client = new HttpClient ();
-            var result = await client.GetAsync (apiKey);
+            using var client = new HttpClient();
+            var result = await client.GetAsync(apiKey);
 
-            result.EnsureSuccessStatusCode ();
+            result.EnsureSuccessStatusCode();
 
-            string responseBody = await result.Content.ReadAsStringAsync ();
-            JObject data = JObject.Parse (responseBody);
-            var token = (JArray) data.SelectToken ("data");
-            var list = new List<APIData> ();
+            string responseBody = await result.Content.ReadAsStringAsync();
+            JObject data = JObject.Parse(responseBody);
+            var token = (JArray) data.SelectToken("data");
+            var list = new List<APIData>();
 
             foreach (var item in token) {
-                list.Add (item.ToObject<APIData> ());
+                list.Add(item.ToObject<APIData>());
             }
 
             return list;
         }
 
-        public List<RequestedOdds> DisplayOdds (List<APIData> data, string BettingSite) {
-
-            var requested = new List<RequestedOdds> ();
+        public List<RequestedOdds> DisplayOdds (List<APIData> data, string BettingSite)
+        {
+            var requested = new List<RequestedOdds>();
 
             try {
-
                 Converter converter = new Converter();
 
                 foreach (var obj in data) {
-                    var addToList = new RequestedOdds ();
+                    var addToList = new RequestedOdds();
                     addToList.HomeTeam = obj.home_team;
                     string[] teams = new string[2] {
                         obj.teams[0],
                         obj.teams[1]
                     };
 
-                    int homeTeamIndex = Array.IndexOf (teams, addToList.HomeTeam);
-                    int awayTeamIndex = (homeTeamIndex == 1) ? 0 : 1;
+                    int homeTeamIndex = Array.IndexOf(teams, addToList.HomeTeam);
+                    int awayTeamIndex =(homeTeamIndex == 1) ? 0 : 1;
 
                     addToList.AwayTeam = teams[awayTeamIndex];
-                    addToList.MatchDate = converter.ConvertUnixTimeStamp (obj.commence_time);
+                    addToList.MatchDate = converter.ConvertUnixTimeStamp(obj.commence_time);
 
-                    List<AllOdds> allOdds = new List<AllOdds> ();
+                    List<AllOdds> allOdds = new List<AllOdds>();
 
                     foreach (var odds in obj.sites) {
                         if (odds.site_nice == BettingSite) {
@@ -61,38 +62,39 @@ namespace discord_project.Modules {
                             addToList.AwayOdds = odds.odds.h2h[awayTeamIndex];
                             addToList.DrawOdds = odds.odds.h2h[2];
                         } else if (BettingSite == "ALL") {
-                            var addToAllOdds = new AllOdds ();
+                            var addToAllOdds = new AllOdds();
                             addToAllOdds.BettingSite = odds.site_nice;
                             addToAllOdds.HomeOdds = odds.odds.h2h[homeTeamIndex];
                             addToAllOdds.AwayOdds = odds.odds.h2h[awayTeamIndex];
                             addToAllOdds.DrawOdds = odds.odds.h2h[2];
 
-                            allOdds.Add (addToAllOdds);
+                            allOdds.Add(addToAllOdds);
                         }
 
                         addToList.AllOdds = allOdds;
                     }
 
-                    addToList.HomeOddsFraction = converter.ConvertDecimalToFractionOdds ((float) addToList.HomeOdds);
-                    addToList.AwayOddsFraction = converter.ConvertDecimalToFractionOdds ((float) addToList.AwayOdds);
-                    addToList.DrawOddsFraction = converter.ConvertDecimalToFractionOdds ((float) addToList.DrawOdds);
+                    addToList.HomeOddsFraction = converter.ConvertDecimalToFractionOdds((float) addToList.HomeOdds);
+                    addToList.AwayOddsFraction = converter.ConvertDecimalToFractionOdds((float) addToList.AwayOdds);
+                    addToList.DrawOddsFraction = converter.ConvertDecimalToFractionOdds((float) addToList.DrawOdds);
 
-                    requested.Add (addToList);
+                    requested.Add(addToList);
                 }
 
                 return requested;
 
             } catch (Exception ex) {
-                Debug.WriteLine (ex.Message);
+                Debug.WriteLine(ex.Message);
             }
 
             return requested;
         }
 
-        public List<MVPSite> FindBestOdds (List<RequestedOdds> data) {
-            List<MVPSite> list = new List<MVPSite> ();
+        public List<MVPSite> FindBestOdds (List<RequestedOdds> data)
+        {
+            List<MVPSite> list = new List<MVPSite>();
             foreach (var games in data) {
-                MVPSite mvpSite = new MVPSite ();
+                MVPSite mvpSite = new MVPSite();
 
                 mvpSite.HomeTeam = games.HomeTeam;
                 mvpSite.AwayTeam = games.AwayTeam;
@@ -132,10 +134,23 @@ namespace discord_project.Modules {
                 mvpSite.BettingSiteDraw = bestBettingSiteDraw;
                 mvpSite.DrawOdds = drawOddsMaxNumber;
 
-                list.Add (mvpSite);
+                list.Add(mvpSite);
             }
 
             return list;
         }
+
+        // public double CreateAccumulator(List<RequestedOdds> AllOdds, List<String> teams)
+        // {
+
+        //     //Get teams from list
+        //     for (int i = 0; i < teams.Count; i++)
+        //     {
+        //         var test[i] = 
+        //     }
+
+        //     //Get object from list of the teams in the Teamslist
+        //     List<RequestedOdds> oddsFromRequestedTeams = AllOdds.Where(s => s.Contains(teams))
+        // }
     }
 }
