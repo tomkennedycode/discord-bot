@@ -23,9 +23,9 @@ namespace discord_project.Modules {
             List<APIData> data = Task.Run(() => api.GetOdds()).Result;
             List<RequestedOdds> allOdds = odds.DisplayOdds(data, bettingSite);
 
-            //double accumulatorOdds = odds.CreateAccumulator(allOdds, info);
+            string accumulatorOdds = odds.CreateAccumulator(allOdds, info);
 
-            await ReplyAsync ("");
+            await ReplyAsync ($"Your accumulator on {bettingSite} has odds of {accumulatorOdds} :thinking:");
 
         }
 

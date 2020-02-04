@@ -7,7 +7,7 @@ using Discord.Commands;
 namespace discord_project.Modules {
     public class OddsBuilder : ModuleBase<SocketCommandContext>
     {
-        public List<RequestedOdds> DisplayOdds (List<APIData> data, string BettingSite)
+        public List<RequestedOdds> DisplayOdds(List<APIData> data, string BettingSite)
         {
             var requested = new List<RequestedOdds>();
 
@@ -65,7 +65,7 @@ namespace discord_project.Modules {
             return requested;
         }
 
-        public List<MVPSite> FindBestOdds (List<RequestedOdds> data)
+        public List<MVPSite> FindBestOdds(List<RequestedOdds> data)
         {
             List<MVPSite> list = new List<MVPSite>();
             foreach (var games in data) {
@@ -115,17 +115,59 @@ namespace discord_project.Modules {
             return list;
         }
 
-        // public double CreateAccumulator(List<RequestedOdds> AllOdds, List<String> teams)
-        // {
+        public string CreateAccumulator(List<RequestedOdds> AllOdds, List<String> teams)
+        {
 
-        //     //Get teams from list
-        //     for (int i = 0; i < teams.Count; i++)
-        //     {
-        //         var test[i] = 
-        //     }
+            string accumulatorFraction = "N/A";
+            try
+            {
 
-        //     //Get object from list of the teams in the Teamslist
-        //     List<RequestedOdds> oddsFromRequestedTeams = AllOdds.Where(s => s.Contains(teams))
-        // }
+                Converter convert = new Converter();
+
+                List<RequestedOdds> listy = new List<RequestedOdds>();
+
+                for (int i = 0; i < teams.Count; i++)
+                {
+                    //Make first letter uppercase
+                    teams[i] = convert.ConvertToUpperCase(teams[i]);
+
+                    //Get object from list of the teams in the Teamslist
+                    var oddsFromRequestedTeams = AllOdds.Find(s => s.HomeTeam.Equals(teams[i]) || s.AwayTeam.Equals(teams[i]));
+
+                    listy.Add(oddsFromRequestedTeams);
+                }
+
+
+                var oddsList = new List<double>();
+
+                for (int i = 0; i < teams.Count; i++)
+                {
+                    if (teams[i] == listy[i].HomeTeam)
+                    {
+                        oddsList.Add(listy[i].HomeOdds);
+                    } else {
+                        oddsList.Add(listy[i].AwayOdds);
+                    }
+                }
+
+                double accumulatorTotal = 1;
+                for (int i = 0; i < oddsList.Count; i++)
+                {
+                    accumulatorTotal *= oddsList[i];
+                }
+
+                accumulatorFraction = convert.ConvertDecimalToFractionOdds((float) accumulatorTotal);
+
+                Console.WriteLine(oddsList);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            return accumulatorFraction;
+
+        }
     }
 }

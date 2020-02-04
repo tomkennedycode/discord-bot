@@ -12,10 +12,14 @@ namespace discord_project.Modules {
             await ReplyAsync ("Lamp is gay");
         }
 
-        [Command ("help")]
+        [Command ("commandhelp")]
         public async Task HelpAsync () {
             await ReplyAsync("no help");
         }
 
+        [Command ("bettingsitehelp")]
+        public async Task SiteHelp() {
+            await ReplyAsync("no help");
+        }
     }
 }

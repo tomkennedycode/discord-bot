@@ -61,5 +61,10 @@ namespace discord_project.Modules {
                     return "Sky Bet";                      
             }
         }
+
+        public string ConvertToUpperCase(string name)
+        {
+            return char.ToUpper(name[0]) + name.Substring(1);
+        }
     }
 }
