@@ -12,6 +12,7 @@ namespace discord_project.Modules {
         public async Task CreateAccumulator (params string[] message) {
             OddsBuilder odds = new OddsBuilder();
             Converter converter = new Converter();
+            APICalls api = new APICalls();
             List<string> info = new List<string>(message);
 
             string bettingSite = converter.ConvertSportKeyToNice(info[0]);
@@ -19,7 +20,7 @@ namespace discord_project.Modules {
             //Remove first entry from list - betting site
             info.RemoveAt(0);
 
-            List<APIData> data = Task.Run(() => odds.GetOdds()).Result;
+            List<APIData> data = Task.Run(() => api.GetOdds()).Result;
             List<RequestedOdds> allOdds = odds.DisplayOdds(data, bettingSite);
 
             //double accumulatorOdds = odds.CreateAccumulator(allOdds, info);
@@ -32,8 +33,9 @@ namespace discord_project.Modules {
         public async Task GetSelectSiteOddsAsync (string BettingSite) {
             OddsBuilder odds = new OddsBuilder();
             Converter converter = new Converter();
+            APICalls api = new APICalls();
 
-            List<APIData> data = Task.Run(() => odds.GetOdds()).Result;
+            List<APIData> data = Task.Run(() => api.GetOdds()).Result;
 
             BettingSite = converter.ConvertSportKeyToNice(BettingSite);
             List<RequestedOdds> siteOdds = odds.DisplayOdds(data, BettingSite);
@@ -57,8 +59,9 @@ namespace discord_project.Modules {
         [Command ("bestodds")]
         public async Task BestOddsAsync () {
             OddsBuilder odds = new OddsBuilder();
+            APICalls api = new APICalls();            
 
-            List<APIData> data = Task.Run(() => odds.GetOdds()).Result;
+            List<APIData> data = Task.Run(() => api.GetOdds()).Result;
             List<RequestedOdds> allOdds = odds.DisplayOdds (data, "ALL");
 
             List<MVPSite> bestOdds = odds.FindBestOdds(allOdds);
@@ -88,8 +91,9 @@ namespace discord_project.Modules {
         [Command ("matches")]
         public async Task GetMatchesAsync() {
             OddsBuilder odds = new OddsBuilder();
+            APICalls api = new APICalls();
 
-            List<APIData> data = Task.Run(() => odds.GetOdds()).Result;
+            List<APIData> data = Task.Run(() => api.GetOdds()).Result;
             List<RequestedOdds> matches = odds.DisplayOdds(data, "Sky Bet");
 
             StringBuilder builder = new StringBuilder();
