@@ -115,16 +115,16 @@ namespace discord_project.Modules {
             return list;
         }
 
-        public string CreateAccumulator(List<RequestedOdds> AllOdds, List<String> teams)
+        public double CreateAccumulator(List<RequestedOdds> AllOdds, List<String> teams)
         {
 
-            string accumulatorFraction = "N/A";
+            double accumulatorTotal = 1;
             try
             {
 
                 Converter convert = new Converter();
 
-                List<RequestedOdds> listy = new List<RequestedOdds>();
+                List<RequestedOdds> teamsOdds = new List<RequestedOdds>();
 
                 for (int i = 0; i < teams.Count; i++)
                 {
@@ -132,41 +132,37 @@ namespace discord_project.Modules {
                     teams[i] = convert.ConvertToUpperCase(teams[i]);
 
                     //Get object from list of the teams in the Teamslist
-                    var oddsFromRequestedTeams = AllOdds.Find(s => s.HomeTeam.Equals(teams[i]) || s.AwayTeam.Equals(teams[i]));
+                    var oddsFromRequestedTeams = AllOdds.Find(s => s.HomeTeam.Contains(teams[i]) || s.AwayTeam.Contains(teams[i]));
 
-                    listy.Add(oddsFromRequestedTeams);
+                    teamsOdds.Add(oddsFromRequestedTeams);
                 }
-
 
                 var oddsList = new List<double>();
 
                 for (int i = 0; i < teams.Count; i++)
                 {
-                    if (teams[i] == listy[i].HomeTeam)
+                    if (teamsOdds[i].HomeTeam.Contains(teams[i]))
                     {
-                        oddsList.Add(listy[i].HomeOdds);
+                        oddsList.Add(teamsOdds[i].HomeOdds);
                     } else {
-                        oddsList.Add(listy[i].AwayOdds);
+                        oddsList.Add(teamsOdds[i].AwayOdds);
                     }
                 }
 
-                double accumulatorTotal = 1;
                 for (int i = 0; i < oddsList.Count; i++)
                 {
                     accumulatorTotal *= oddsList[i];
                 }
 
-                accumulatorFraction = convert.ConvertDecimalToFractionOdds((float) accumulatorTotal);
-
-                Console.WriteLine(oddsList);
-
+                accumulatorTotal = Math.Round(accumulatorTotal, 2);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex.Message);
+                ReplyAsync(ex.Message);
             }
 
-            return accumulatorFraction;
+            return accumulatorTotal;
 
         }
     }
