@@ -3,11 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace discord_project.Modules {
-    public class Utilities : ModuleBase<SocketCommandContext> {
+namespace discord_project.Modules
+{
+    public class Utilities : ModuleBase<SocketCommandContext>
+    {
 
-        [Command ("settimer")]
-        public async Task SetLampTimer(int timer) {
+        [Command("settimer")]
+        public async Task SetLampTimer(int timer)
+        {
             try
             {
                 double milliseconds = TimeSpan.FromMinutes(timer).TotalMilliseconds;
@@ -33,7 +36,7 @@ namespace discord_project.Modules {
             {
                 await ReplyAsync(ex.Message);
                 throw;
-            }            
+            }
         }
     }
 }

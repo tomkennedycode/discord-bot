@@ -49,21 +49,21 @@ namespace discord_project
         {
             _client.MessageReceived += HandleCommandAsync;
             await _command.AddModulesAsync(Assembly.GetEntryAssembly(), _service);
-            
+
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
             var message = arg as SocketUserMessage;
 
-            if(message is null || message.Author.IsBot)
+            if (message is null || message.Author.IsBot)
             {
                 return;
             }
 
             int argumentPosition = 0;
 
-            if(message.HasStringPrefix("bot!", ref argumentPosition) || message.HasMentionPrefix(_client.CurrentUser, ref argumentPosition))
+            if (message.HasStringPrefix("bot!", ref argumentPosition) || message.HasMentionPrefix(_client.CurrentUser, ref argumentPosition))
             {
                 var context = new SocketCommandContext(_client, message);
 

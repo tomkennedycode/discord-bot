@@ -4,22 +4,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace discord_project.Modules {
-    public class Converter : ModuleBase<SocketCommandContext> {
-        public string ConvertUnixTimeStamp (int time) {
+namespace discord_project.Modules
+{
+    public class Converter : ModuleBase<SocketCommandContext>
+    {
+        public string ConvertUnixTimeStamp(int time)
+        {
             DateTime convertUnixTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             convertUnixTime = convertUnixTime.AddSeconds(time).ToLocalTime();
 
-            var formattedTime = convertUnixTime.Date.ToString ("dd/MM/yyy") + " " + convertUnixTime.TimeOfDay.ToString();
+            var formattedTime = convertUnixTime.Date.ToString("dd/MM/yyy") + " " + convertUnixTime.TimeOfDay.ToString();
             return formattedTime;
         }
 
-        public string ConvertDecimalToFractionOdds (float odds) {
+        public string ConvertDecimalToFractionOdds(float odds)
+        {
             int calc = 0;
 
-            while (true) {
+            while (true)
+            {
                 calc++;
-                if (odds * calc == (int)(odds * calc)) {
+                if (odds * calc == (int)(odds * calc))
+                {
                     break;
                 }
             }
@@ -30,13 +36,14 @@ namespace discord_project.Modules {
             return $"{topFraction}/{bottomFraction}";
         }
 
-        public string ConvertSportKeyToNice (string key)
+        public string ConvertSportKeyToNice(string key)
         {
-            switch(key) {
+            switch (key)
+            {
                 case "skybet":
                     return "Sky Bet";
                 case "betfred":
-                    return "Betfred"; 
+                    return "Betfred";
                 case "williamhill":
                     return "William Hill";
                 case "paddypower":
@@ -54,11 +61,11 @@ namespace discord_project.Modules {
                 case "sport888":
                     return "888sport";
                 case "matchbook":
-                    return "Matchbook";  
+                    return "Matchbook";
                 case "onexbet":
-                    return "1xBet";      
+                    return "1xBet";
                 default:
-                    return "Sky Bet";                      
+                    return "Sky Bet";
             }
         }
 

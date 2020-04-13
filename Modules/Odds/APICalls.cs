@@ -6,7 +6,8 @@ using discord_project.Models;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
 
-namespace discord_project.Modules {
+namespace discord_project.Modules
+{
     public class APICalls : ModuleBase<SocketCommandContext>
     {
         public async Task<List<APIData>> GetOdds()
@@ -20,10 +21,11 @@ namespace discord_project.Modules {
 
             string responseBody = await result.Content.ReadAsStringAsync();
             JObject data = JObject.Parse(responseBody);
-            var token = (JArray) data.SelectToken("data");
+            var token = (JArray)data.SelectToken("data");
             var list = new List<APIData>();
 
-            foreach (var item in token) {
+            foreach (var item in token)
+            {
                 list.Add(item.ToObject<APIData>());
             }
 

@@ -4,17 +4,20 @@ using System.Diagnostics;
 using discord_project.Models;
 using Discord.Commands;
 
-namespace discord_project.Modules {
+namespace discord_project.Modules
+{
     public class OddsBuilder : ModuleBase<SocketCommandContext>
     {
         public List<RequestedOdds> DisplayOdds(List<APIData> data, string BettingSite)
         {
             var requested = new List<RequestedOdds>();
 
-            try {
+            try
+            {
                 Converter converter = new Converter();
 
-                foreach (var obj in data) {
+                foreach (var obj in data)
+                {
                     var addToList = new RequestedOdds();
                     addToList.HomeTeam = obj.home_team;
                     string[] teams = new string[2] {
@@ -23,20 +26,24 @@ namespace discord_project.Modules {
                     };
 
                     int homeTeamIndex = Array.IndexOf(teams, addToList.HomeTeam);
-                    int awayTeamIndex =(homeTeamIndex == 1) ? 0 : 1;
+                    int awayTeamIndex = (homeTeamIndex == 1) ? 0 : 1;
 
                     addToList.AwayTeam = teams[awayTeamIndex];
                     addToList.MatchDate = converter.ConvertUnixTimeStamp(obj.commence_time);
 
                     List<AllOdds> allOdds = new List<AllOdds>();
 
-                    foreach (var odds in obj.sites) {
-                        if (odds.site_nice == BettingSite) {
+                    foreach (var odds in obj.sites)
+                    {
+                        if (odds.site_nice == BettingSite)
+                        {
                             addToList.BettingSite = odds.site_nice;
                             addToList.HomeOdds = odds.odds.h2h[homeTeamIndex];
                             addToList.AwayOdds = odds.odds.h2h[awayTeamIndex];
                             addToList.DrawOdds = odds.odds.h2h[2];
-                        } else if (BettingSite == "ALL") {
+                        }
+                        else if (BettingSite == "ALL")
+                        {
                             var addToAllOdds = new AllOdds();
                             addToAllOdds.BettingSite = odds.site_nice;
                             addToAllOdds.HomeOdds = odds.odds.h2h[homeTeamIndex];
@@ -49,16 +56,18 @@ namespace discord_project.Modules {
                         addToList.AllOdds = allOdds;
                     }
 
-                    addToList.HomeOddsFraction = converter.ConvertDecimalToFractionOdds((float) addToList.HomeOdds);
-                    addToList.AwayOddsFraction = converter.ConvertDecimalToFractionOdds((float) addToList.AwayOdds);
-                    addToList.DrawOddsFraction = converter.ConvertDecimalToFractionOdds((float) addToList.DrawOdds);
+                    addToList.HomeOddsFraction = converter.ConvertDecimalToFractionOdds((float)addToList.HomeOdds);
+                    addToList.AwayOddsFraction = converter.ConvertDecimalToFractionOdds((float)addToList.AwayOdds);
+                    addToList.DrawOddsFraction = converter.ConvertDecimalToFractionOdds((float)addToList.DrawOdds);
 
                     requested.Add(addToList);
                 }
 
                 return requested;
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Debug.WriteLine(ex.Message);
             }
 
@@ -68,7 +77,8 @@ namespace discord_project.Modules {
         public List<MVPSite> FindBestOdds(List<RequestedOdds> data)
         {
             List<MVPSite> list = new List<MVPSite>();
-            foreach (var games in data) {
+            foreach (var games in data)
+            {
                 MVPSite mvpSite = new MVPSite();
 
                 mvpSite.HomeTeam = games.HomeTeam;
@@ -83,19 +93,23 @@ namespace discord_project.Modules {
                 double drawOddsMaxNumber = 0;
                 string bestBettingSiteDraw = String.Empty;
 
-                foreach (var odds in games.AllOdds) {
+                foreach (var odds in games.AllOdds)
+                {
 
-                    if (odds.HomeOdds > homeOddsMaxNumber) {
+                    if (odds.HomeOdds > homeOddsMaxNumber)
+                    {
                         homeOddsMaxNumber = odds.HomeOdds;
                         bestBettingSiteHome = odds.BettingSite;
                     }
 
-                    if (odds.AwayOdds > awayOddsMaxNumber) {
+                    if (odds.AwayOdds > awayOddsMaxNumber)
+                    {
                         awayOddsMaxNumber = odds.AwayOdds;
                         bestBettingSiteAway = odds.BettingSite;
                     }
 
-                    if (odds.DrawOdds > drawOddsMaxNumber) {
+                    if (odds.DrawOdds > drawOddsMaxNumber)
+                    {
                         drawOddsMaxNumber = odds.DrawOdds;
                         bestBettingSiteDraw = odds.BettingSite;
                     }
@@ -144,7 +158,9 @@ namespace discord_project.Modules {
                     if (teamsOdds[i].HomeTeam.Contains(teams[i]))
                     {
                         oddsList.Add(teamsOdds[i].HomeOdds);
-                    } else {
+                    }
+                    else
+                    {
                         oddsList.Add(teamsOdds[i].AwayOdds);
                     }
                 }
