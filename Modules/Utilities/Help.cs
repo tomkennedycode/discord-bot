@@ -9,7 +9,7 @@ namespace discord_project.Modules {
 
         [Command ("lamp")]
         public async Task LampAsync () {
-            await ReplyAsync ("Lamp is gay");
+            await ReplyAsync ("Lamp isn't cool");
         }
 
         [Command ("commandhelp")]
