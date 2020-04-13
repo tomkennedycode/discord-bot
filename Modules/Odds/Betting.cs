@@ -10,7 +10,7 @@ namespace discord_project.Modules
 {
     public class Betting : ModuleBase<SocketCommandContext>
     {
-        [Command("Bet")]
+        [Command("bet")]
         public async Task CreateAccumulator(params string[] message)
         {
             OddsBuilder odds = new OddsBuilder();

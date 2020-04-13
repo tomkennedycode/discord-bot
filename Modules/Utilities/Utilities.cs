@@ -9,7 +9,7 @@ namespace discord_project.Modules
     {
 
         [Command("settimer")]
-        public async Task SetLampTimer(int timer)
+        public async Task SetTimer(int timer)
         {
             try
             {
