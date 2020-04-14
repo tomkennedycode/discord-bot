@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.Commands;
@@ -37,6 +38,21 @@ namespace discord_project.Modules
                 await ReplyAsync(ex.Message);
                 throw;
             }
+        }
+
+        [Command("flipcoin")]
+        public async Task FlipCoin()
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+
+            //Random 1000 times
+            string flipped1000 = String.Join("\n", Enumerable.Repeat(0, 1000).Select(i => random.Next(0, 2) == 1 ? "Tails" : "Heads"));
+
+            //Count how many times each won
+            int heads = flipped1000.Count(i => i == 'H');
+            int tails = flipped1000.Count(i => i == 'T');
+
+            await ReplyAsync((heads > tails ? "**Heads**" : "**Tails**") + " is the winner!");
         }
     }
 }

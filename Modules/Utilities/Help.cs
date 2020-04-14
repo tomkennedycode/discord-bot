@@ -30,8 +30,11 @@ namespace discord_project.Modules
         {
             StringBuilder builder = new StringBuilder();
             //Timer help
-            builder.Append("> :timer: To set a timer, type __**bot!settimer**__ followed by a space and number of minutes. This command only supports minutes at the moment.");
-            //
+            builder.Append(">>> :timer: To set a timer, type __**bot!settimer**__ followed by a space and number of minutes. This command only supports minutes at the moment.");
+            builder.Append(Environment.NewLine);
+
+            //Coin Flip
+            builder.Append(":pound: To flip a coin, type __**bot!flipcoin**__");
             await ReplyAsync(builder.ToString());
         }
 
