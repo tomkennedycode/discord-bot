@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using discord_project.Models;
+using discord_project.Models.Odds;
 using Discord.Commands;
 
-namespace discord_project.Modules
+namespace discord_project.Modules.Odds
 {
     public class Betting : ModuleBase<SocketCommandContext>
     {

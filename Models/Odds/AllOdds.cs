@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 
-namespace discord_project.Models
+namespace discord_project.Models.Odds
 {
     public class AllOdds
     {

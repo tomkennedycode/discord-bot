@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using discord_project.Models.Odds;
+using discord_project.Models.Dota;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
 
-namespace discord_project.Modules.Odds
+namespace discord_project.Modules.Dota
 {
     public class APICalls : ModuleBase<SocketCommandContext>
     {
-        public async Task<List<APIData>> GetOdds()
+        public async Task<List<APIData>> GetDotaItems()
         {
             string apiKey = "";
 

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace discord_project.Modules
+namespace discord_project.Modules.Odds
 {
     public class Converter : ModuleBase<SocketCommandContext>
     {

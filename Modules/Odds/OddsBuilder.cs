@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using discord_project.Models;
+using discord_project.Models.Odds;
 using Discord.Commands;
 
-namespace discord_project.Modules
+namespace discord_project.Modules.Odds
 {
     public class OddsBuilder : ModuleBase<SocketCommandContext>
     {
